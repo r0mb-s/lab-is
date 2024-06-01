@@ -1,0 +1,113 @@
+\documentclass{article}
+
+\usepackage{enumerate}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+
+\begin{document}
+
+\section{Explain rigorously why each of these triples hold:}
+
+\begin{enumerate}[(a)]
+	\item \{\{$x == y$\}\} $z := x - y$ \{\{$z == 0$\}\}
+	      \\ We assume that x equals y. If x equals y, then x subtracted by y will equal 0. As z equals
+	      x subtracted by y, z equals 0 - which is the postcondition
+	\item \{\{true\}\} $x := 100$ \{\{$x == 100$\}\}
+	      \\ As the term true is always true we can ignore the precondition. If x equals 100, then
+	      x will equal 100 - which is the postcondition
+	\item \{\{$0 \le x < 100$\}\} x := x + 1 \{\{$0 \le x \le 100$\}\}
+	      \\ As x $\in [0, 100)$, x + 1 $\in [0 + 1, 100 + 1)$ which is equivalent with
+	      x + 1 $\in [1, 101)$ which is equivalent with x + 1 $\in [0, 100]$ - which is the
+	      postcondition
+\end{enumerate}
+
+\section{For each of the following triples, find initial values for x and y that demonstrate that the
+  triple does not hold.}
+\begin{enumerate}[(a)]
+	\item \{\{true\}\} $x := 2 * y$ \{\{$y \le x$\}\}
+	      \\ When y equals -1, x equals -2. As -2 is less than -1, $y > x$ - which contradicts the
+	      postcondition
+	\item \{\{$0 \le x$\}\} $x := x - 1$ \{\{$0 \le x$\}\}
+	      \\ When $x = 0$, $x - 1 = -1$ and as $-1 < 0$ the postcondition doesn't stand
+\end{enumerate}
+
+\section{For each of the following triples, come up with some predicate to replace the question mark
+  to make it a Hoare triple that holds. Make your conditions as precise as possible.}
+\begin{enumerate}[(a)]
+	\item \{\{$0 \le x < 100$\}\} $x := 2 * x$ \{\{?\}\}
+	      \\ As the program states that x will become $2 * x$, then the inequalities from the precondition
+	      will become $0 \le x < 200$ which can become the postcondition
+	\item \{\{$0 \le x < N$\}\} $x := x + 1$ \{\{?\}\}
+	      \\ As the program states that x will become $x + 1$, then the inequalities from the precondition
+	      will become $1 \le x < N + 1$ which can become the postcondition
+\end{enumerate}
+
+\section{For each of the following triples, come up with some predicate to replace the question mark
+  to make it a Hoare triple that holds. Make your conditions as precise as possible.}
+\begin{enumerate}[(a)]
+	\item \{\{?\}\} $x := 400$ \{\{$x == 400$\}\}
+	      \\ As we need x to be 400, and the program states that x will be 400, the precondition can
+	      be anything
+	\item \{\{?\}\} $x := 65$ \{\{$y \le x$\}\}
+	      \\ If $x = 65$ then $y \le 65$, which should be the precondition
+\end{enumerate}
+
+\section{Write the program which computes the sum of first n natural numbers.}
+
+For the following Hoare Logic formula we have:
+\\ P: $n \in \mathbb{N}$
+\\ I: $\text{sum} == \frac{i(i + 1)}{2}$
+\\ b: $i \le n$
+\\ c: $\text{sum} = \text{sum} + 1$, $i = i + 1$
+\\ Q: $\text{sum} = \frac{n(n + 1)}{2}$
+\\ t: $n - 1$
+
+\begin{equation*}
+    \frac
+    {P \Longrightarrow I \quad I \Longrightarrow t \ge 0 \quad \{\{I \wedge b \wedge t\}\} \ c \ \{\{I \wedge t < N\}\} \quad (I \wedge \neg b) \Longrightarrow Q}
+    {\{\{P\}\} \ \text{while} \ b \ \text{do} \ c \ \{\{Q\}\}}
+\end{equation*}
+
+\begin{verbatim}
+method sum(n: nat) returns (sum: nat)
+  ensures sum == n * (n + 1) / 2
+{
+  var i := 0;
+  sum := 0;
+  while i <= n
+    invariant 0 <= i <= n + 1
+    invariant sum == i * (i - 1) / 2
+    decreases n - i
+  {
+    sum := sum + i;
+    i := i + 1;
+  }
+}
+\end{verbatim}
+
+\section{Write the program which computes the product of first n natural numbers. Prove its total
+correctness.}
+\begin{verbatim}
+function factorial(n: nat) : nat
+  decreases n
+{
+  if n == 0 then 1 else n * factorial(n - 1)
+}
+
+method product(n: nat) returns (prod: nat)
+  ensures prod == factorial(n)
+{
+  var i := 1;
+  prod := 1;
+  while i <= n
+    invariant 0 <= i <= n + 1
+    invariant prod == factorial(i - 1)
+    decreases n - i
+  {
+    prod := prod * i;
+    i := i + 1;
+  }
+}
+\end{verbatim}
+
+\end{document}
